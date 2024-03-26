@@ -1,4 +1,5 @@
-GIT_HEAD_REF := $(shell git rev-parse HEAD)
+# GIT_HEAD_REF := $(shell git rev-parse HEAD)
+GIT_HEAD_REF := d3d1fd95713f3b9616745c737ee5b696a4c09f8b
 
 BASE_IMAGE := pytorch/pytorch:1.9.0-cuda11.1-cudnn8-devel
 
@@ -120,7 +121,9 @@ train: pull-train-image
 		--mount type=bind,source=$(BASE_DIR)/wandb,target=/app/wandb \
 		tscholak/$(TRAIN_IMAGE_NAME):$(GIT_HEAD_REF) \
 		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train.json"
-
+# tscholak/$(TRAIN_IMAGE_NAME):$(GIT_HEAD_REF) "\"
+# d3d1fd95713f3b9616745c737ee5b696a4c09f8b
+# tscholak/$(TRAIN_IMAGE_NAME):d3d1fd95713f3b9616745c737ee5b696a4c09f8b "\"
 .PHONY: train_cosql
 train_cosql: pull-train-image
 	mkdir -p -m 777 train
@@ -197,3 +200,39 @@ prediction_output: pull-eval-image
 		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
 		tscholak/$(EVAL_IMAGE_NAME):$(GIT_HEAD_REF) \
 		/bin/bash -c "python seq2seq/prediction_output.py configs/prediction_output.json"
+
+
+################ 
+# Local Builds #
+################
+
+.PHONY: build_local
+build_local:
+	docker build -t local:latest .
+
+.PHONY: run_local_test
+run_local_test:
+	mkdir -p -m 777 train_test
+	mkdir -p -m 777 transformers_cache
+	mkdir -p -m 777 wandb
+	docker run -it \
+		--mount type=bind,source=$(BASE_DIR)/train_test,target=/train_test \
+		--mount type=bind,source=$(BASE_DIR)/transformers_cache,target=/transformers_cache \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/wandb,target=/app/wandb \
+		local:latest \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_test.json"
+
+.PHONY: run_local_subset
+run_local_subset:
+	mkdir -p -m 777 train_subset
+	mkdir -p -m 777 transformers_cache
+	mkdir -p -m 777 wandb
+	docker run -it \
+		--mount type=bind,source=$(BASE_DIR)/train_subset,target=/train_subset \
+		--mount type=bind,source=$(BASE_DIR)/transformers_cache,target=/transformers_cache \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/wandb,target=/app/wandb \
+		local:latest \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_subset.json"
+		
