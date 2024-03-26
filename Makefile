@@ -11,6 +11,7 @@ BUILDKIT_BUILDER ?= buildx-local
 BASE_DIR := $(shell pwd)
 
 BASE_REPO_OWNER := denverbaumgartner
+BASE_REPO_KEY := /home/ubuntu/snap/gh/502/.ssh/id_ed25519
 
 .PHONY: init-buildkit
 init-buildkit:
@@ -63,10 +64,10 @@ build-dev-image:
 .PHONY: pull-dev-image
 pull-dev-image:
 	docker pull tscholak/$(DEV_IMAGE_NAME):$(GIT_HEAD_REF)
-
+ 
 .PHONY: build-train-image
 build-train-image:
-	ssh-add
+	eval $$(ssh-agent -s) && ssh-add $(BASE_REPO_KEY) && \
 	docker buildx build --no-cache \
 		--builder $(BUILDKIT_BUILDER) \
 		--ssh default=$(SSH_AUTH_SOCK) \
