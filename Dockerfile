@@ -1,4 +1,5 @@
-ARG BASE_IMAGE
+# ARG BASE_IMAGE
+ARG BASE_IMAGE=pytorch/pytorch:1.9.0-cuda11.1-cudnn8-devel
 
 # ------------------------
 # Target: dev
