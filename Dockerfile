@@ -76,8 +76,9 @@ RUN cd /app/third_party/fmt/ \
     && cd .. \
     && rm -rf _build
 COPY --chown=$TOOLKIT_USER_ID:$TOOLKIT_GROUP_ID third_party/folly /app/third_party/folly/
-RUN pip install cython \
+RUN pip install cython==0.29.28 \ 
     && cd /app/third_party/folly \
+    && rm /app/third_party/folly/folly/python/executor.cpp \
     && mkdir _build \
     && cd _build \
     && cmake -DBUILD_SHARED_LIBS=ON -DPYTHON_EXTENSIONS=ON -DBUILD_EXAMPLES=off -DBUILD_TESTS=off ../. \
