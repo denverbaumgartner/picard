@@ -10,6 +10,8 @@ BUILDKIT_IMAGE := tscholak/text-to-sql-buildkit:buildx-stable-1
 BUILDKIT_BUILDER ?= buildx-local
 BASE_DIR := $(shell pwd)
 
+BASE_REPO_OWNER := denverbaumgartner
+
 .PHONY: init-buildkit
 init-buildkit:
 	docker buildx create \
@@ -44,7 +46,7 @@ build-picard:
 .PHONY: build-dev-image
 build-dev-image:
 	ssh-add
-	docker buildx build \
+	docker buildx build --no-cache \
 		--builder $(BUILDKIT_BUILDER) \
 		--ssh default=$(SSH_AUTH_SOCK) \
 		-f Dockerfile \
@@ -56,7 +58,7 @@ build-dev-image:
 		--cache-from type=registry,ref=tscholak/$(DEV_IMAGE_NAME):cache \
 		--cache-to type=inline \
 		--push \
-		git@github.com:ElementAI/picard#$(GIT_HEAD_REF)
+		git@github.com:$(BASE_REPO_OWNER)/picard#$(GIT_HEAD_REF)
 
 .PHONY: pull-dev-image
 pull-dev-image:
@@ -65,7 +67,7 @@ pull-dev-image:
 .PHONY: build-train-image
 build-train-image:
 	ssh-add
-	docker buildx build \
+	docker buildx build --no-cache \
 		--builder $(BUILDKIT_BUILDER) \
 		--ssh default=$(SSH_AUTH_SOCK) \
 		-f Dockerfile \
@@ -76,7 +78,7 @@ build-train-image:
 		--cache-from type=registry,ref=tscholak/$(TRAIN_IMAGE_NAME):cache \
 		--cache-to type=inline \
 		--push \
-		git@github.com:ElementAI/picard#$(GIT_HEAD_REF)
+		git@github.com:$(BASE_REPO_OWNER)/picard#$(GIT_HEAD_REF)
 
 .PHONY: pull-train-image
 pull-train-image:
@@ -85,7 +87,7 @@ pull-train-image:
 .PHONY: build-eval-image
 build-eval-image:
 	ssh-add
-	docker buildx build \
+	docker buildx build  --no-cache \
 		--builder $(BUILDKIT_BUILDER) \
 		--ssh default=$(SSH_AUTH_SOCK) \
 		-f Dockerfile \
@@ -96,7 +98,7 @@ build-eval-image:
 		--cache-from type=registry,ref=tscholak/$(EVAL_IMAGE_NAME):cache \
 		--cache-to type=inline \
 		--push \
-		git@github.com:ElementAI/picard#$(GIT_HEAD_REF)
+		git@github.com:$(BASE_REPO_OWNER)/picard#$(GIT_HEAD_REF)
 
 .PHONY: pull-eval-image
 pull-eval-image:

@@ -5,6 +5,10 @@ ARG BASE_IMAGE
 # ------------------------
 FROM $BASE_IMAGE as dev
 
+# solve the build issue of missing keys: https://github.com/ServiceNow/picard/issues/111
+RUN rm /etc/apt/sources.list.d/cuda.list
+RUN rm /etc/apt/sources.list.d/nvidia-ml.list
+
 ARG TOOLKIT_USER_ID=13011
 ARG TOOLKIT_GROUP_ID=13011
 
