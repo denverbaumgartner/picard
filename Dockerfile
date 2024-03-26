@@ -76,6 +76,8 @@ RUN cd /app/third_party/fmt/ \
     && cd .. \
     && rm -rf _build
 COPY --chown=$TOOLKIT_USER_ID:$TOOLKIT_GROUP_ID third_party/folly /app/third_party/folly/
+# explicitly set cython version 
+# rm executor.cpp from folly
 RUN pip install cython==0.29.28 \ 
     && cd /app/third_party/folly \
     && rm /app/third_party/folly/folly/python/executor.cpp \
@@ -161,8 +163,10 @@ RUN set -eux; \
     chown -R $TOOLKIT_USER_ID:$TOOLKIT_GROUP_ID /app/.local/rustup;
 
 # Install Haskell toolchain
-ENV BOOTSTRAP_HASKELL_NONINTERACTIVE=yes \
-    BOOTSTRAP_HASKELL_NO_UPGRADE=yes \
+# ENV BOOTSTRAP_HASKELL_NONINTERACTIVE=yes \
+#     BOOTSTRAP_HASKELL_NO_UPGRADE=yes \
+# resolve haskell issues: https://github.com/siyue-zhang/picard/blob/8b2df2bd3cf08ac525b8f1858ea3d3d13ca3a290/Dockerfile#L168
+ENV BOOTSTRAP_HASKELL_MINIMAL=yes \
     GHCUP_USE_XDG_DIRS=yes \
     GHCUP_INSTALL_BASE_PREFIX=/app \
     CABAL_DIR=/app/.cabal \
@@ -177,22 +181,34 @@ RUN buildDeps=" \
     apt-get update \
     && apt-get install -y --no-install-recommends $buildDeps $deps \
     && curl --proto '=https' --tlsv1.2 -sSf https://get-ghcup.haskell.org | sh \
-    && ghcup install ghc \
-    && ghcup install cabal \
+    # && ghcup install ghc \
+    # && ghcup install cabal \
+    # explicitly define haskell build dependency versions: https://github.com/siyue-zhang/picard/blob/8b2df2bd3cf08ac525b8f1858ea3d3d13ca3a290/Dockerfile#L183
+    && ghcup install ghc base-4.14.1.0 \ 
+    && ghcup set ghc "8.10.4" \
+    && export PATH="/app/.ghcup/bin:$PATH" \
+    && ghcup install cabal 3.10.1.0 \
+
     && cabal update \
     && apt-get install -y --no-install-recommends git \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && git clone https://github.com/haskell/cabal.git \
     && cd cabal \
-    && git checkout f5f8d933db229d30e6fc558f5335f0a4e85d7d44 \
-    && sed -i 's/3.5.0.0/3.6.0.0/' */*.cabal \
-    && cabal install cabal-install/ \
+
+    # && git checkout f5f8d933db229d30e6fc558f5335f0a4e85d7d44 \
+    # && sed -i 's/3.5.0.0/3.6.0.0/' */*.cabal \
+    # && cabal install cabal-install/ \
+    # explicily define cabal version and allow newer testsuit: https://github.com/siyue-zhang/picard/blob/8b2df2bd3cf08ac525b8f1858ea3d3d13ca3a290/Dockerfile#L193
+    && git checkout HEAD \
+    && sed -i 's/3.5.0.0/3.10.1.0/' */*.cabal \
+    && cabal install --package-env . cabal-install/ \    
         --allow-newer=Cabal-QuickCheck:Cabal \
         --allow-newer=Cabal-described:Cabal \
         --allow-newer=Cabal-tree-diff:Cabal \
         --allow-newer=cabal-install:Cabal \
         --allow-newer=cabal-install-solver:Cabal \
+        --allow-newer=cabal-testsuite \ 
     && cd .. \
     && rm -rf cabal/ \
     && rm -rf /app/.cabal/packages/* \
