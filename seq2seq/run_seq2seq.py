@@ -77,11 +77,24 @@ def main() -> None:
         init_args = {}
         if "MLFLOW_EXPERIMENT_ID" in os.environ:
             init_args["group"] = os.environ["MLFLOW_EXPERIMENT_ID"]
-        wandb.init(
-            project=os.getenv("WANDB_PROJECT", "text-to-sql"),
-            name=training_args.run_name,
-            **init_args,
-        )
+        if model_args.resume_run: 
+            if model_args.run_id == "": 
+                logger.infor("No run_id provided when attempting to resume run")
+                return 
+            else: 
+                wandb.init(
+                    project=os.getenv("WANDB_PROJECT", "text-to-sql"),
+                    name=training_args.run_name,
+                    id=model_args.run_id,
+                    resume=model_args.resume_run,
+                    **init_args,
+                )
+        else:
+            wandb.init(
+                project=os.getenv("WANDB_PROJECT", "text-to-sql"),
+                name=training_args.run_name,
+                **init_args,
+            )
         wandb.config.update(combined_args_dict, allow_val_change=True)
 
     if not training_args.do_train and not training_args.do_eval and not training_args.do_predict:

@@ -37,3 +37,11 @@ class ModelArguments:
             "with private models)."
         },
     )
+    run_id: str = field(
+        default="",
+        metadata={"help": "The run_id used by wandb to specify an individual run."}
+    )
+    resume_run: bool = field(
+        default=False,
+        metadata={"help": "Related to logging to wandb. Boolean to indicate whether to resume a prior run or not. Tied to the run_id value."}
+    )
