@@ -133,4 +133,8 @@ class SpiderTrainer(Seq2SeqTrainer):
         # decoded_references = self.tokenizer.batch_decode(label_ids, skip_special_tokens=True)
         # references = [{**{"query": r}, **m} for r, m in zip(decoded_references, metas)]
         references = metas
-        return self.metric.compute(predictions=predictions, references=references)
+        try: 
+            results = self.metric.compute(predictions=predictions, references=references)
+        except: 
+            results = {}
+        return results

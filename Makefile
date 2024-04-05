@@ -210,17 +210,25 @@ prediction_output: pull-eval-image
 build_local:
 	docker build -t local:latest .
 
+.PHONY: build_local_reproduce
+build_local_reproduce:
+	docker build -t local:reproduce .
+
+.PHONY: build_local_test
+build_local_test:
+	docker build -t local:test .
+
 .PHONY: run_local_test
 run_local_test:
 	mkdir -p -m 777 train_test
-	mkdir -p -m 777 transformers_cache
+	mkdir -p -m 777 transformers_cache_test
 	mkdir -p -m 777 wandb
 	docker run -it \
 		--mount type=bind,source=$(BASE_DIR)/train_test,target=/train_test \
-		--mount type=bind,source=$(BASE_DIR)/transformers_cache,target=/transformers_cache \
+		--mount type=bind,source=$(BASE_DIR)/transformers_cache_test,target=/transformers_cache_test \
 		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
 		--mount type=bind,source=$(BASE_DIR)/wandb,target=/app/wandb \
-		local:latest \
+		local:test \
 		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_test.json"
 
 .PHONY: run_local_subset
@@ -236,3 +244,86 @@ run_local_subset:
 		local:latest \
 		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_subset.json"
 		
+.PHONY: run_local
+run_local:
+	mkdir -p -m 777 train
+	mkdir -p -m 777 transformers_cache
+	mkdir -p -m 777 wandb
+	docker run -it \
+		--mount type=bind,source=$(BASE_DIR)/train,target=/train \
+		--mount type=bind,source=$(BASE_DIR)/transformers_cache,target=/transformers_cache \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/wandb,target=/app/wandb \
+		local:latest \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train.json"
+
+.PHONY: run_local_reproduce
+run_local_reproduce:
+	mkdir -p -m 777 train_reproduce
+	mkdir -p -m 777 transformers_cache
+	mkdir -p -m 777 wandb
+	docker run -it \
+		--mount type=bind,source=$(BASE_DIR)/train_reproduce,target=/train_reproduce \
+		--mount type=bind,source=$(BASE_DIR)/transformers_cache,target=/transformers_cache \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/wandb,target=/app/wandb \
+		local:reproduce \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_reproduce.json"
+
+.PHONY: run_local_clear
+run_local_clear:
+	mkdir -p -m 777 train_full_clear_cache
+	mkdir -p -m 777 transformers_cache_clear
+	mkdir -p -m 777 wandb_clear_cache
+	docker run -it \
+		--mount type=bind,source=$(BASE_DIR)/train_full_clear_cache,target=/train_full_clear_cache \
+		--mount type=bind,source=$(BASE_DIR)/transformers_cache_clear,target=/transformers_cache_clear \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/wandb_clear_cache,target=/app/wandb_clear_cache \
+		local:latest \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_clear_cache.json"
+
+.PHONY: eval_local
+eval_local:
+	mkdir -p -m 777 eval
+	mkdir -p -m 777 transformers_cache
+	mkdir -p -m 777 wandb
+	docker run \
+		-it \
+		--rm \
+		--user 13011:13011 \
+		--mount type=bind,source=$(BASE_DIR)/eval,target=/eval \
+		--mount type=bind,source=$(BASE_DIR)/transformers_cache,target=/transformers_cache \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/wandb,target=/app/wandb \
+		local:latest \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/eval_local.json"
+
+.PHONY: eval_local_reproduce
+eval_local_reproduce:
+	mkdir -p -m 777 eval
+	mkdir -p -m 777 transformers_cache
+	mkdir -p -m 777 wandb
+	docker run \
+		-it \
+		--rm \
+		--user 13011:13011 \
+		--mount type=bind,source=$(BASE_DIR)/eval,target=/eval \
+		--mount type=bind,source=$(BASE_DIR)/transformers_cache,target=/transformers_cache \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/wandb,target=/app/wandb \
+		local:reproduce \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/eval_local.json"
+
+.PHONY: run_local_data
+run_local_data:
+	mkdir -p -m 777 train_data
+	mkdir -p -m 777 transformers_cache_test
+	mkdir -p -m 777 wandb
+	docker run -it \
+		--mount type=bind,source=$(BASE_DIR)/train_data,target=/train_data \
+		--mount type=bind,source=$(BASE_DIR)/transformers_cache_test,target=/transformers_cache_test \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/wandb,target=/app/wandb \
+		local:latest \
+		/bin/bash -c "python seq2seq/load_data.py configs/train_data.json"

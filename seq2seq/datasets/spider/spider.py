@@ -43,7 +43,7 @@ _HOMEPAGE = "https://yale-lily.github.io/spider"
 _LICENSE = "CC BY-SA 4.0"
 
 # _URL = "https://drive.google.com/uc?export=download&id=1_AckYkinAnhqmRQtGsQgUKAnTHxxX5J0&confirm=t"
-_TYPE = 'spider_subset'
+_TYPE = 'spider' # _subset # _test
 _URL = f"data/{_TYPE}.zip" # TODO: either go back to dynamic URLs or abstract this to a config variable
 
 
