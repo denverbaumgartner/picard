@@ -79,16 +79,21 @@ def main() -> None:
 
     write_path = training_args.output_dir + '/train_data.csv'
     print(write_path)
-    #train_df = dataset_splits.train_split.dataset.to_csv(write_path)
+    # train_df = dataset_splits.train_split.dataset.to_csv(write_path)
 
-    #df = dataset_splits.train_split.dataset.to_pandas()
+    df = dataset_splits.train_split.dataset.to_pandas()
     def add_input_text(example):
         decoded_text = tokenizer.decode(example['input_ids'], skip_special_tokens=True)
         example['input_text'] = decoded_text
         return example
+    def add_target_text(example): 
+        decoded_text = tokenizer.decode(example['labels'], skip_special_tokens=True)
+        example['target_text'] = decoded_text
+        return example
 
     data = dataset_splits.train_split.dataset
     updated_data = data.map(add_input_text)
+    updated_data = data.map(add_target_text)
     updated_data.to_csv(write_path)
 
     # Decode the input_ids back to text
