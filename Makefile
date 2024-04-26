@@ -218,6 +218,10 @@ build_local_reproduce:
 build_local_test:
 	docker build -t local:test .
 
+.PHONY: build_data
+build_data:
+	docker build -t local:data .
+
 .PHONY: run_local_test
 run_local_test:
 	mkdir -p -m 777 train_test
@@ -233,17 +237,108 @@ run_local_test:
 
 .PHONY: run_local_subset
 run_local_subset:
-	mkdir -p -m 777 train_subset
-	mkdir -p -m 777 transformers_cache
-	mkdir -p -m 777 wandb
+	mkdir -p -m 777 spider_subset_train
+	mkdir -p -m 777 spider_subset_cache
+	mkdir -p -m 777 spider_subset_log
 	docker run -it \
-		--mount type=bind,source=$(BASE_DIR)/train_subset,target=/train_subset \
-		--mount type=bind,source=$(BASE_DIR)/transformers_cache,target=/transformers_cache \
+		--mount type=bind,source=$(BASE_DIR)/spider_subset_train,target=/spider_subset_train \
+		--mount type=bind,source=$(BASE_DIR)/spider_subset_cache,target=/spider_subset_cache \
 		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
-		--mount type=bind,source=$(BASE_DIR)/wandb,target=/app/wandb \
+		--mount type=bind,source=$(BASE_DIR)/spider_subset_log,target=/app/spider_subset_log \
 		local:latest \
 		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_subset.json"
+
+.PHONY: run_local_syn_subset
+run_local_syn_subset:
+	mkdir -p -m 777 spider_syn_subset_train
+	mkdir -p -m 777 spider_syn_subset_cache
+	mkdir -p -m 777 spider_syn_subset_log
+	docker run -it \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_subset_train,target=/spider_syn_subset_train \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_subset_cache,target=/spider_syn_subset_cache \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_subset_log,target=/app/spider_syn_subset_log \
+		local:latest \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_syn_subset.json"
+
+.PHONY: run_local_syn_embedding_subset
+run_local_syn_embedding_subset:
+	mkdir -p -m 777 spider_syn_embedding_subset_train
+	mkdir -p -m 777 spider_syn_embedding_subset_cache
+	mkdir -p -m 777 spider_syn_embedding_subset_log
+	docker run -it \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_embedding_subset_train,target=/spider_syn_embedding_subset_train \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_embedding_subset_cache,target=/spider_syn_embedding_subset_cache \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_embedding_subset_log,target=/app/spider_syn_embedding_subset_log \
+		local:latest \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_syn_embedding_subset.json"
+
+.PHONY: run_local_syn_random_subset
+run_local_syn_random_subset:
+	mkdir -p -m 777 spider_syn_random_subset_train
+	mkdir -p -m 777 spider_syn_random_subset_cache
+	mkdir -p -m 777 spider_syn_random_subset_log
+	docker run -it \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_random_subset_train,target=/spider_syn_random_subset_train \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_random_subset_cache,target=/spider_syn_random_subset_cache \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_random_subset_log,target=/app/spider_syn_random_subset_log \
+		local:latest \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_syn_random_subset.json"
+
+.PHONY: run_local_syn_full_filter_00
+run_local_syn_full_filter_00:
+	mkdir -p -m 777 spider_syn_full_filter_00_train
+	mkdir -p -m 777 spider_syn_full_filter_00_cache
+	mkdir -p -m 777 spider_syn_full_filter_00_log
+	docker run -it \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_full_filter_00_train,target=/spider_syn_full_filter_00_train \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_full_filter_00_cache,target=/spider_syn_full_filter_00_cache \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_full_filter_00_log,target=/app/spider_syn_full_filter_00_log \
+		local:latest \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_syn_full_filter_00.json"
 		
+.PHONY: run_local_syn_all_easy_subset_00
+run_local_syn_all_easy_subset_00:
+	mkdir -p -m 777 spider_syn_all_easy_subset_00_train
+	mkdir -p -m 777 spider_syn_all_easy_subset_00_cache
+	mkdir -p -m 777 spider_syn_all_easy_subset_00_log
+	docker run -it \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_all_easy_subset_00_train,target=/spider_syn_all_easy_subset_00_train \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_all_easy_subset_00_cache,target=/spider_syn_all_easy_subset_00_cache \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_all_easy_subset_00_log,target=/app/spider_syn_all_easy_subset_00_log \
+		local:latest \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_syn_all_easy_subset_00.json"
+
+.PHONY: run_local_syn_all_match_subset_00
+run_local_syn_all_match_subset_00:
+	mkdir -p -m 777 spider_syn_match_easy_subset_00_train
+	mkdir -p -m 777 spider_syn_match_easy_subset_00_cache
+	mkdir -p -m 777 spider_syn_match_easy_subset_00_log
+	docker run -it \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_match_easy_subset_00_train,target=/spider_syn_match_easy_subset_00_train \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_match_easy_subset_00_cache,target=/spider_syn_match_easy_subset_00_cache \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/spider_syn_match_easy_subset_00_log,target=/app/spider_syn_match_easy_subset_00_log \
+		local:latest \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_syn_match_easy_subset_00.json"
+
+.PHONY: run_local_spider_original_all_easy_subset_00
+run_local_spider_original_all_easy_subset_00:
+	mkdir -p -m 777 spider_original_all_easy_subset_00_train
+	mkdir -p -m 777 spider_original_all_easy_subset_00_cache
+	mkdir -p -m 777 spider_original_all_easy_subset_00_log
+	docker run -it \
+		--mount type=bind,source=$(BASE_DIR)/spider_original_all_easy_subset_00_train,target=/spider_original_all_easy_subset_00_train \
+		--mount type=bind,source=$(BASE_DIR)/spider_original_all_easy_subset_00_cache,target=/spider_original_all_easy_subset_00_cache \
+		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
+		--mount type=bind,source=$(BASE_DIR)/spider_original_all_easy_subset_00_log,target=/app/spider_original_all_easy_subset_00_log \
+		local:latest \
+		/bin/bash -c "python seq2seq/run_seq2seq.py configs/train_spider_original_all_easy_subset_00.json"
+
 .PHONY: run_local
 run_local:
 	mkdir -p -m 777 train
@@ -317,13 +412,13 @@ eval_local_reproduce:
 
 .PHONY: run_local_data
 run_local_data:
-	mkdir -p -m 777 train_data
-	mkdir -p -m 777 transformers_cache_test
-	mkdir -p -m 777 wandb
+	mkdir -p -m 777 test_data_loading_train
+	mkdir -p -m 777 test_data_loading_cache
+	mkdir -p -m 777 test_data_loading_log
 	docker run -it \
-		--mount type=bind,source=$(BASE_DIR)/train_data,target=/train_data \
-		--mount type=bind,source=$(BASE_DIR)/transformers_cache_test,target=/transformers_cache_test \
+		--mount type=bind,source=$(BASE_DIR)/test_data_loading_train,target=/test_data_loading_train \
+		--mount type=bind,source=$(BASE_DIR)/test_data_loading_cache,target=/test_data_loading_cache \
 		--mount type=bind,source=$(BASE_DIR)/configs,target=/app/configs \
-		--mount type=bind,source=$(BASE_DIR)/wandb,target=/app/wandb \
-		local:latest \
+		--mount type=bind,source=$(BASE_DIR)/test_data_loading_log,target=/app/test_data_loading_log \
+		local:data \
 		/bin/bash -c "python seq2seq/load_data.py configs/train_data.json"

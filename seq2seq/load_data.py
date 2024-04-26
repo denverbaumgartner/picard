@@ -93,7 +93,7 @@ def main() -> None:
 
     data = dataset_splits.train_split.dataset
     updated_data = data.map(add_input_text)
-    updated_data = data.map(add_target_text)
+    updated_data = updated_data.map(add_target_text)
     updated_data.to_csv(write_path)
 
     # Decode the input_ids back to text
